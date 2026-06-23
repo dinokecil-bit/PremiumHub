@@ -1,7 +1,7 @@
 -- [[ PREMIUM HUB V5: OFFICIALLY FIXED BY AI ]]
 -- File ini wajib dinamai: Smart_PremiumHub.lua
 
-local OrionLib = loadstring(game:HttpGet(('https://githubusercontent.com')))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
 
 local Window = OrionLib:MakeWindow({
     Name = "PremiumHub - 100 Hari Di Laut", 
