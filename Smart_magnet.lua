@@ -1,13 +1,16 @@
 -- =====================================================================
--- REVISI V13: FIXED LOCK COORD + ANTI LEAK & DRAGGABLE UI
+-- REVISI V15: FIXED LOCK COORD + AUTO EAT SECURITY & DRAGGABLE UI
 -- =====================================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
+local VirtualUser = game:GetService("VirtualUser")
 local localPlayer = Players.LocalPlayer
 
 local sampahDitahan = {}
+local fiturAutoEat = true -- Ubah ke false jika ingin mematikan auto eat saja
 
+-- [1. SENSOR UTAMA: Mencari Bonfire Rakit]
 local function cariBonfireRakitAwal(playerRoot)
     local targetBonfire = nil
     local jarakTerdekat = math.huge
@@ -26,25 +29,54 @@ local function cariBonfireRakitAwal(playerRoot)
     return targetBonfire
 end
 
+-- [2. OTOT OTOMATIS: Sistem Pemakan Makanan Mandiri]
+local function cekDanMakanOtomatis(char)
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    local backpack = localPlayer:FindFirstChildOfClass("Backpack")
+    
+    if humanoid and humanoid.Health < (humanoid.MaxHealth * 0.4) and fiturAutoEat then
+        -- Mencari makanan murni lautan di inventory/tas
+        local makanan = backpack:FindFirstChild("Biscuit") or backpack:FindFirstChild("Potato") or char:FindFirstChild("Biscuit") or char:FindFirstChild("Potato")
+        
+        if makanan then
+            -- Pasang makanan ke tangan karakter
+            if makanan.Parent == backpack then
+                makanan.Parent = char
+            end
+            task.wait(0.1)
+            -- Simulasi klik layar pintar untuk memakan makanan secara instan
+            VirtualUser:Button1Down(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+            task.wait(0.1)
+            VirtualUser:Button1Up(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+        end
+    end
+end
+
+-- [3. MAIN ENGINE: Fitur Tarik Magnet Pro]
 local function jalankanFiturMagnet(statusAktif)
     _G.AutoCollectDebris = statusAktif
     if _G.AutoCollectDebris then
-        print("[Delta Hub]: Menimbun sampah di atas Bonfire Rakit...")
+        print("[Delta Hub]: Menimbun sampah & mengaktifkan Sensor Nutrisi...")
         sampahDitahan = {}
         task.spawn(function()
             local targetBonfirePart = nil
             while _G.AutoCollectDebris do
-                task.wait(0.5)
+                task.wait(0.4) -- Delay optimal anti-lag
                 pcall(function()
                     local char = localPlayer.Character
                     local root = char and char:FindFirstChild("HumanoidRootPart")
                     if root then
+                        -- Jalankan pengecekan darah dan makan otomatis di latar belakang
+                        cekDanMakanOtomatis(char)
+
                         if not targetBonfirePart or not targetBonfirePart.Parent then
                             targetBonfirePart = cariBonfireRakitAwal(root)
                         end
+                        
                         local folderSampah = Workspace:FindFirstChild("Debris") or Workspace:FindFirstChild("Items") or Workspace
                         local objekTarget = folderSampah:GetChildren()
                         if folderSampah == Workspace then objekTarget = Workspace:GetDescendants() end
+                        
                         for _, obj in pairs(objekTarget) do
                             if not _G.AutoCollectDebris then break end
                             if obj:IsA("BasePart") then
