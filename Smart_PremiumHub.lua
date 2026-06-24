@@ -1,15 +1,20 @@
--- [[ PREMIUM HUB V5: OFFICIALLY FIXED BY AI ]]
--- File ini wajib dinamai: Smart_PremiumHub.lua
+-- [[ PREMIUM HUB V7: FIXED FLUENT UI EDITION ]]
+-- Tampilan menu tipis, modern, dan sangat rapi cocok untuk HP
 
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
-local Window = OrionLib:MakeWindow({
-    Name = "PremiumHub - 100 Hari Di Laut", 
-    HidePremium = false, 
-    SaveConfig = true, 
-    ConfigFolder = "PremiumHubConfig"
+-- 1. PEMBUATAN WINDOW UTAMA (UKURAN DAN TEMA SEPERTI DI GAMBAR)
+local Window = Fluent:CreateWindow({
+    Title = "PremiumHub | 100 Days At Sea",
+    SubTitle = "by dinokecil-bit",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(480, 320), -- Ukuran minimalis tidak memenuhi layar
+    Acrylic = false, 
+    Theme = "Dark", -- Tema gelap elegan
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
+-- 2. MANAGEMENT STATE / VARIABEL UTAMA
 _G.AutoMagnetDebris = false
 _G.AutoReturnToBase = false
 _G.AutoHumanChest = false
@@ -32,44 +37,54 @@ local function isSafeItem(obj)
     return true
 end
 
-local FarmTab = Window:MakeTab({
-    Name = "Main Farm",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- 3. MEMBUAT DAFTAR TAB UTAMA (IKON & TEXT)
+local Tabs = {
+    MainFarm = Window:AddTab({ Title = "Main Farm", Icon = "home" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
 
-FarmTab:AddToggle({
-    Name = "Smart Magnet Debris",
+-- 4. MENAMBAHKAN TOMBOL ON/OFF (TOGGLE) PADA TAB MAIN FARM
+Tabs.MainFarm:AddToggle("MagnetDebrisToggle", {
+    Title = "Smart Magnet Debris",
     Default = false,
     Callback = function(Value)
         _G.AutoMagnetDebris = Value
-    end    
+    end
 })
 
-FarmTab:AddToggle({
-    Name = "Lock Position to Base Rakit",
+Tabs.MainFarm:AddToggle("LockBaseToggle", {
+    Title = "Lock Position to Base Rakit",
     Default = false,
     Callback = function(Value)
         _G.AutoReturnToBase = Value
-    end    
+    end
 })
 
-FarmTab:AddToggle({
-    Name = "Auto Smart Chest Open & Claim",
+Tabs.MainFarm:AddToggle("ChestToggle", {
+    Title = "Auto Smart Chest Open & Claim",
     Default = false,
     Callback = function(Value)
         _G.AutoHumanChest = Value
-    end    
+    end
 })
 
-FarmTab:AddToggle({
-    Name = "Smart Target Kill Hitbox",
+Tabs.MainFarm:AddToggle("HitboxToggle", {
+    Title = "Smart Target Kill Hitbox",
     Default = false,
     Callback = function(Value)
         _G.AutoAttackHitbox = Value
-    end    
+    end
 })
 
+-- =======================================================================
+-- TEMPAT MENAMBAH FITUR BARU DI MASA DEPAN (TINGGAL COPY-PASTE CONTOH DI BAWAH)
+-- =======================================================================
+-- Jika nanti mau tambah fitur baru, tinggal buka baris kosong di bawah ini lalu ketik:
+-- Tabs.MainFarm:AddToggle("NamaVariabelBebas", { Title = "Nama Fitur Di Layar", Default = false, Callback = function(v) _G.NamaFiturBaru = v end })
+-- =======================================================================
+
+
+-- 5. LOGIKA PROSES LATAR BELAKANG (ANTI-CRASH MULTI-THREADED)
 task.spawn(function()
     while true do
         task.wait(0.4)
@@ -157,4 +172,9 @@ task.spawn(function()
     end
 end)
 
-OrionLib:Init()
+-- Notifikasi bahwa menu berhasil dimuat
+Fluent:Notify({
+    Title = "PremiumHub Loaded",
+    Content = "Skrip berhasil dijalankan dengan Fluent UI!",
+    Duration = 5
+})
