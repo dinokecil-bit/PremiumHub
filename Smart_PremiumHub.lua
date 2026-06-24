@@ -66,6 +66,68 @@ Tabs.MainFarm:AddToggle("ChestToggle", {
     Default = false,
     Callback = function(Value) _G.AutoHumanChest = Value end
 })
+})
+
+Tabs.MainFarm:AddToggle("HitboxToggle", {
+    Title = "Smart Target Kill Hitbox",
+    Default = false,
+    Callback = function(Value) _G.AutoAttackHitbox = Value end
+})
+
+Tabs.MainFarm:AddToggle("AutoAttackNearestToggle", {
+    Title = "Auto Attack (Nearest Mob)",
+    Default = false,
+    Callback = function(Value) _G.AutoAttackNearest = Value end
+})
+
+Tabs.MainFarm:AddSlider("AttackDelaySlider", {
+    Title = "Auto Attack Delay",
+    Description = "Mengatur jeda kecepatan serangan otomatis",
+    Default = 0.3,
+    Min = 0.1,
+    Max = 2.0,
+    Rounding = 1,
+    Callback = function(Value) _G.AttackDelayValue = Value end
+})
+
+Tabs.Weapon:AddToggle("InfiniteHarpoonToggle", {
+    Title = "Infinite Harpoon Range",
+    Default = false,
+    Callback = function(Value) _G.InfiniteHarpoonRange = Value end
+})
+
+Tabs.Settings:AddToggle("AntiAfkToggle", {
+    Title = "Anti-AFK (Anti Disconnect)",
+    Default = false,
+    Callback = function(Value) _G.AntiAfkActive = Value end
+})
+
+local CoreGui = game:GetService("CoreGui")
+local ToggleGui = Instance.new("ScreenGui")
+local ToggleButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+
+ToggleGui.Name = "PremiumHubToggleGui"
+ToggleGui.Parent = CoreGui
+ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ToggleGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.BackgroundTransparency = 0.2
+ToggleButton.Position = UDim2.new(0, 10, 0.4, 0)
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Text = "PH"
+ToggleButton.TextColor3 = Color3.fromRGB(0, 150, 255)
+ToggleButton.TextSize = 18
+
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = ToggleButton
+
+ToggleButton.MouseButton1Click:Connect(function()
+    Window:Minimize()
+end)
 
 Tabs.MainFarm:AddToggle("HitboxToggle", {
     Title = "Smart Target Kill Hitbox",
