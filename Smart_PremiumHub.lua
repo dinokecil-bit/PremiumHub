@@ -1,7 +1,7 @@
 -- [[ PREMIUM HUB V10: ULTIMATE MOBILE EDITION ]]
 -- BAGIAN 1: SISTEM INTEGRASI TAMPILAN MENU (FLUENT UI MINI)
 
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua')))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
 -- PEMBUATAN WINDOW UTAMA (UKURAN MINI & TRANSPARAN BLUR SEPERTI ZHUB)
 local Window = Fluent:CreateWindow({
