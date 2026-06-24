@@ -134,6 +134,132 @@ Tabs.MainFarm:AddToggle("HitboxToggle", {
     Default = false,
     Callback = function(Value) _G.AutoAttackHitbox = Value end
 })
+-- 7. LOGIKA PROSES LATAR BELAKANG (ANTI-CRASH MULTI-THREADED)
+task.spawn(function()
+    while true do
+        task.wait(0.4)
+        if _G.AutoMagnetDebris then
+            pcall(function()
+                if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+                local currentTarget = LocalPlayer.Character.HumanoidRootPart.CFrame
+                if _G.AutoReturnToBase and BaseSpawnPosition then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = BaseSpawnPosition
+                    currentTarget = BaseSpawnPosition
+                end
+                for _, item in pairs(Workspace:GetChildren()) do
+                    if isSafeItem(item) then
+                        if item:IsA("BasePart") then
+                            item.CFrame = currentTarget * CFrame.new(0, 3, 0)
+                        elseif item:IsA("Model") and item.PrimaryPart then
+                            item:SetPrimaryPartCFrame(currentTarget * CFrame.new(0, 3, 0))
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if _G.AutoHumanChest then
+            pcall(function()
+                if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    if not _G.AutoHumanChest then break end
+                    if obj:IsA("Model") or obj:IsA("BasePart") then
+                        if string.find(string.lower(obj.Name), "chest") or string.find(string.lower(obj.Name), "treasure") or string.find(string.lower(obj.Name), "kotak") then
+                            local chestCFrame = obj:IsA("BasePart") and obj.CFrame or obj.PrimaryPart and obj.PrimaryPart.CFrame
+                            if chestCFrame then
+                                LocalPlayer.Character.HumanoidRootPart.CFrame = chestCFrame * CFrame.new(0, 3, 0)
+                                task.wait(2.5) 
+                                local prompt = obj:FindFirstChildOfClass("ProximityPrompt") or obj:GetComponentOfClass("ProximityPrompt")
+                                if prompt then fireproximityprompt(prompt) end
+                                task.wait(1.5)
+                                local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+                                if PlayerGui then
+                                    for _, guiElement in pairs(PlayerGui:GetDescendants()) do
+                                        if guiElement:IsA("TextButton") or guiElement:IsA("ImageButton") then
+                                            local labelText = guiElement:FindFirstChildOfClass("TextLabel") and guiElement:FindFirstChildOfClass("TextLabel").Text or guiElement.Name
+                                            if string.find(string.lower(labelText), "claim") or string.find(string.lower(labelText), "take") or string.find(string.lower(labelText), "ok") or string.find(string.lower(labelText), "buka") then
+                                                guiElement:Activate()
+                                                task.wait(0.5)
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(_G.AttackDelayValue or 0.3)
+        if _G.AutoAttackHitbox or _G.AutoAttackNearest then
+            pcall(function()
+                if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+                local closestMob = nil
+                local shortestDistance = 100
+                for _, target in pairs(Workspace:GetDescendants()) do
+                    if target.Name == "Hitbox" and (target:IsA("BasePart") or target:IsA("MeshPart")) then
+                        local jarak = (LocalPlayer.Character.HumanoidRootPart.Position - target.Position).Magnitude
+                        if _G.AutoAttackHitbox and jarak < 100 then
+                            if LocalPlayer.Character:FindFirstChildOfClass("Tool") then
+                                LocalPlayer.Character:FindFirstChildOfClass("Tool"):Activate()
+                                target.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2)
+                            end
+                        elseif _G.AutoAttackNearest and jarak < shortestDistance then
+                            closestMob = target
+                            shortestDistance = jarak
+                        end
+                    end
+                end
+                if _G.AutoAttackNearest and closestMob and LocalPlayer.Character:FindFirstChildOfClass("Tool") then
+                    LocalPlayer.Character:FindFirstChildOfClass("Tool"):Activate()
+                    closestMob.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2)
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        if _G.InfiniteHarpoonRange then
+            pcall(function()
+                local harpoon = LocalPlayer.Backpack:FindFirstChild("Harpoon") or LocalPlayer.Character:FindFirstChild("Harpoon")
+                if harpoon then
+                    if harpoon:FindFirstChild("MaxDistance") then harpoon.MaxDistance.Value = 999999
+                    elseif harpoon:FindFirstChild("Range") then harpoon.Range.Value = 999999 end
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    local VirtualUser = game:GetService("VirtualUser")
+    LocalPlayer.Idled:Connect(function()
+        if _G.AntiAfkActive then
+            VirtualUser:Button2Down(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+            task.wait(1)
+            VirtualUser:Button2Up(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+        end
+    end)
+end)
+
+Fluent:Notify({
+    Title = "PremiumHub V10 Loaded",
+    Content = "Skrip Ultimate Edition Berhasil Dijalankan!",
+    Duration = 5
+})
 
 Tabs.MainFarm:AddToggle("AutoAttackNearestToggle", {
     Title = "Auto Attack (Nearest Mob)",
